@@ -4,12 +4,14 @@
  *  
  *  Author: Ethan Jones
  *  Date: 2023-02-16
+ *  
+ *  To-do list:
+ *  - Needs final test and debug.
  */
 
 #include "Thing.h"
 
 char MAC_ADDRESS[13];
-
 
 void getMAC(char *buf) {
   uint64_t mac = ESP.getEfuseMac();
@@ -21,7 +23,6 @@ void getMAC(char *buf) {
   }
   buf[12] = '\0';
 }
-
 
 void setup() {
   // put your setup code here, to run once:
