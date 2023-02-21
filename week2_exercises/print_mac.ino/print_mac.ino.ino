@@ -9,8 +9,6 @@
  *  - Needs final test and debug.
  */
 
-#include "Thing.h"
-
 char MAC_ADDRESS[13];
 
 void getMAC(char *buf) {
@@ -18,8 +16,8 @@ void getMAC(char *buf) {
   char rev[13];
   sprintf(rev, "%04X%08X", (uint16_t) (mac >> 32), (uint32_t) mac);
   for(int i=0, j=11; i<=10; i+=2, j-=2) {
-    buf[i] = rev[j - 1];
-    buf[i + 1] = rev[j];
+    buf[i] = rev[j-1];
+    buf[i+1] = rev[j];
   }
   buf[12] = '\0';
 }
