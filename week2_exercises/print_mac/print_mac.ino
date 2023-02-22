@@ -1,12 +1,10 @@
-/* `print_mac.ino` script - WIP
+/* `print_mac.ino` script
  *  
  *  Prints the MAC address of an ESP32 microcontroller.
  *  
  *  Author: Ethan Jones
  *  Date: 2023-02-16
  *  
- *  To-do list:
- *  - Needs final test and debug.
  */
 
 char MAC_ADDRESS[13];
