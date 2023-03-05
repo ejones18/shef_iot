@@ -5,13 +5,13 @@
  *  Author: Ethan Jones
  *  Date: 2023-02-28
  *
- *  WIP
  */
 
 #include <WiFi.h>
 #include <WebServer.h>
 
 const int red = 10;
+const int yellow = 11;
 const int green = 12;
 
 String apSSID;
@@ -23,6 +23,7 @@ char MAC_ADDRESS[13];
 #define dln(b, s) if(b) Serial.println(s)
 #define netDBG          true
 
+//AP functions
 void getMAC(char *buf) {
   uint64_t mac = ESP.getEfuseMac();
   char rev[13];
@@ -32,17 +33,6 @@ void getMAC(char *buf) {
     buf[i+1] = rev[j];
   }
   buf[12] = '\0';
-}
-
-void startAP() {
-  getMAC(MAC_ADDRESS);
-  apSSID = String("Thing-");
-  apSSID.concat(MAC_ADDRESS);
-  if(! WiFi.mode(WIFI_AP_STA))
-    dln(startupDBG, "failed to set Wifi mode");
-  if(! WiFi.softAP(apSSID.c_str(), "dumbpassword"))
-    dln(startupDBG, "failed to start soft AP");
-  printIPs();
 }
 
 void printIPs() {
@@ -58,17 +48,24 @@ void printIPs() {
     WiFi.printDiag(Serial);
 }
 
+void startAP() {
+  getMAC(MAC_ADDRESS);
+  apSSID = String("Thing-");
+  apSSID.concat(MAC_ADDRESS);
+  if(! WiFi.mode(WIFI_AP_STA))
+    dln(startupDBG, "failed to set Wifi mode");
+  if(! WiFi.softAP(apSSID.c_str(), "dumbpassword"))
+    dln(startupDBG, "failed to start soft AP");
+  printIPs();
+}
+
+//Web server functions
 void startWebServer() {
   webServer.on("/", handleRoot);
-  webServer.on("/hello", handleHello);
   webServer.onNotFound(handleNotFound);
   webServer.begin();
   dln(startupDBG, "HTTP server started");
-  digitalWrite(green, HIGH);
-}
-
-String getPageBody() {
-  return "<h2>Welcome to Thing!</h2>\n";
+  digitalWrite(yellow, HIGH);
 }
 
 void handleNotFound() {
@@ -81,15 +78,9 @@ void handleRoot() {
   dln(netDBG, "serving page notionally at /");
   String toSend = getPageTop();
   toSend += getPageBody();
+  toSend += getPageFooter();
   webServer.send(200, "text/html", toSend);
-}
-void handleHello() {
-  dln(netDBG, "serving /hello");
-  webServer.send(
-    200,
-    "text/plain",
-    "Hello!\n"
-  );
+  digitalWrite(green, HIGH);
 }
 
 String getPageTop() {
@@ -103,11 +94,23 @@ String getPageTop() {
   ;
 };
 
+String getPageBody() {
+  return "<h2>Welcome to Thing!</h2>\n";
+}
+
+String getPageFooter() {
+  return "\n<p><a href='/'>Home</a>&nbsp;&nbsp;&nbsp;</p></body></html>\n";
+}
+
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
   pinMode(green, OUTPUT);
+  pinMode(yellow, OUTPUT);
   pinMode(red, OUTPUT);
   startAP();
   startWebServer();
+}
+
+void loop() {
+  webServer.handleClient();
 }
